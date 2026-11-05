@@ -1,6 +1,6 @@
 # DEATHSTEP distribution
 
-Two ways to play: **online** (website, nothing to install) and **Windows installer** (offline, from GitHub Releases).
+Two ways to play: **online** (website) and **ZIP download** (extract, double-click `PLAY DEATHSTEP.bat`, plays offline). The ZIP is served by the website itself from `site/downloads/`. The Electron installer files are kept as an optional extra.
 
 ```
 game/index.html   the game (single source of truth)
@@ -49,3 +49,12 @@ npm run dist     # build dist/DEATHSTEP-Setup.exe (run on Windows)
 ## Known limits
 - The installer is **not code-signed**, so Windows SmartScreen shows "Windows protected your PC" (More info > Run anyway). Signing needs a paid certificate.
 - Progress is saved in the browser or app storage on that device, and is not shared between the web and desktop versions.
+
+## ZIP download (what the website button links to)
+`site/downloads/DEATHSTEP.zip` and `version.json` are generated from `game/index.html`:
+```
+npm run sync              # (or: node scripts/sync.js)  copy the game into site/play
+python scripts/make_zip.py   # rebuild site/downloads/DEATHSTEP.zip + version.json (version comes from package.json)
+```
+Commit both, push, and Vercel redeploys. The page shows the real version, size, date and SHA-256 from `version.json`.
+Bump `"version"` in `package.json` before rebuilding the ZIP for a new release.
