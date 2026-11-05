@@ -1,0 +1,41 @@
+name: Build and release Windows installer
+on:
+  push:
+    tags: ['v*']        # git tag v1.0.1 && git push origin v1.0.1
+  workflow_dispatch:     # manual test build (uploads an artifact, no release)
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        shell: bash
+        run: npm install
+      - name: Set version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
+      - name: Build installer
+        shell: bash
+        run: npm run dist
+      - name: SHA256 checksum
+        shell: pwsh
+        run: |
+          cd dist
+          $h = (Get-FileHash DEATHSTEP-Setup.exe -Algorithm SHA256).Hash.ToLower()
+          "$h  DEATHSTEP-Setup.exe" | Out-File -Encoding ascii SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DEATHSTEP-Setup
+          path: dist/DEATHSTEP-Setup.exe
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" dist/DEATHSTEP-Setup.exe dist/SHA256SUMS.txt --title "DEATHSTEP $GITHUB_REF_NAME" --generate-notes

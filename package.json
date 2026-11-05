@@ -1,0 +1,31 @@
+{
+  "name": "deathstep",
+  "productName": "DEATHSTEP",
+  "version": "1.0.0",
+  "description": "DEATHSTEP - a funny, frustrating troll platformer",
+  "author": "Pocket34",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "sync": "node scripts/sync.js",
+    "dist": "node scripts/sync.js && electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": { "electron": "45.2.1", "electron-builder": "26.14.0" },
+  "build": {
+    "appId": "com.pocket34.deathstep",
+    "productName": "DEATHSTEP",
+    "copyright": "Copyright (c) 2026 Pocket34",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "game/**/*", "build/icon.png", "package.json"],
+    "asar": true,
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.ico", "artifactName": "DEATHSTEP-Setup.exe" },
+    "nsis": {
+      "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true, "createStartMenuShortcut": true, "shortcutName": "DEATHSTEP",
+      "installerIcon": "build/icon.ico", "uninstallerIcon": "build/icon.ico", "runAfterFinish": true,
+      "artifactName": "DEATHSTEP-Setup.exe"
+    }
+  }
+}
